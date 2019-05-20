@@ -9,9 +9,9 @@ import hts.projekt.shared.User;
 import hts.projekt.shared.Wallet;
 
 public interface ServiceAsync {
-	void login(String username, String password, AsyncCallback<User> callback);
+	void login(String username, String password, AsyncCallback<Wallet> callback);
 
-	void signUp(String username, String password, AsyncCallback<User> callback);
+	void signUp(String username, String password, AsyncCallback<Wallet> callback);
 
 	void getWallet(User user, AsyncCallback<Wallet> callback);
 

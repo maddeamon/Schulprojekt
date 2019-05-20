@@ -103,15 +103,15 @@ public class DatabaseConnector {
 
 		try {
 
-			ResultSet rs = getResultFromDatabase("SELECT * FROM Wallet WHERE Benutzername=" + username);
+			ResultSet rs = getResultFromDatabase("SELECT * FROM Konto WHERE Benutzername='" + username + "'");
 			while (rs.next()) {
-				wallets.add(new Wallet(rs.getString("username"), rs.getLong("Wallet_ID"), null,
-						rs.getDouble("Guthaben"), rs.getString("Währung")));
+				wallets.add(new Wallet(rs.getString("Benutzername"), rs.getLong("Konto_ID"), null,
+						rs.getDouble("Guthaben"), rs.getString("Waehrung")));
 			}
 
 			for (Wallet wallet : wallets) {
 				ResultSet result = getResultFromDatabase(
-						"SELECT * FROM Konto_Aktie ka JOIN Aktie on ka.Aktie_ID=a.Aktie_ID JOIN Firma f on a.Firma_ID=f.Firma_ID WHERE ka.Konto_ID="
+						"SELECT * FROM Konto_Aktie ka JOIN Aktie a on ka.Aktie_ID=a.Aktie_ID JOIN Firma f on a.Firma_ID=f.Firma_ID WHERE ka.Konto_ID="
 								+ wallet.getWalletId());
 				while (result.next()) {
 					wallet.addEquity(new Equity(result.getString("Aktie_ID"), result.getString("AktieBezeichnung"),
@@ -125,6 +125,8 @@ public class DatabaseConnector {
 			e.printStackTrace();
 		}
 
+		System.out.println("Wallet recieved.");
+
 		return wallets.stream().findFirst().orElse(null);
 	}
 
@@ -133,15 +135,15 @@ public class DatabaseConnector {
 
 		try {
 
-			ResultSet rs = getResultFromDatabase("SELECT * FROM Wallet WHERE Wallet_ID=" + walletId);
+			ResultSet rs = getResultFromDatabase("SELECT * FROM Konto WHERE Konto_ID=" + walletId);
 			while (rs.next()) {
-				wallets.add(new Wallet(rs.getString("username"), rs.getLong("Wallet_ID"), null,
-						rs.getDouble("Guthaben"), rs.getString("Währung")));
+				wallets.add(new Wallet(rs.getString("Benutzername"), rs.getLong("Konto_ID"), null,
+						rs.getDouble("Guthaben"), rs.getString("Waehrung")));
 			}
 
 			for (Wallet wallet : wallets) {
 				ResultSet result = getResultFromDatabase(
-						"SELECT * FROM Wallet_Aktie WHERE Wallet_ID=" + wallet.getWalletId());
+						"SELECT * FROM Konto_Aktie WHERE Konto_ID=" + wallet.getWalletId());
 				while (result.next()) {
 					// wallet.setEquities(equities);
 				}
@@ -152,6 +154,11 @@ public class DatabaseConnector {
 		}
 
 		return wallets.stream().findFirst().orElse(null);
+	}
+
+	public static void addNewWallet(User user) {
+		changeDataOnDatabase("INSERT INTO Konto (Benutzername, Guthaben, Waehrung) VALUES ('" + user.getUsername()
+				+ "', 10000, 'EUR'");
 	}
 
 	public static Double getCurrentPrice(Long equityId) {

@@ -30,20 +30,27 @@ public class SimulatorUI extends LayoutPanel {
 
 	private void initializeUI() {
 
+		VerticalPanel mainPanel = new VerticalPanel();
+
 		HorizontalPanel userPanel = initializeUserPanel();
 		VerticalPanel ownedEquitiesPanel = initializeOwnedPanel();
 		VerticalPanel availableEquitiesPanel = initializeAvailablePanel();
 
-		add(userPanel);
-		add(ownedEquitiesPanel);
-		add(availableEquitiesPanel);
+		mainPanel.add(userPanel);
+		mainPanel.add(ownedEquitiesPanel);
+		mainPanel.add(availableEquitiesPanel);
+
+		getElement().getStyle().setBackgroundColor("red");
+		add(mainPanel);
 	}
 
 	private HorizontalPanel initializeUserPanel() {
 		HorizontalPanel userPanel = new HorizontalPanel();
-		Label username = new Label(StockSimulator.getActiveUser().getUsername());
-		Label savings = new Label(StockSimulator.getActiveWallet().getSavings().toString()
-				+ StockSimulator.getActiveWallet().getCurrency());
+		Label username = new Label(StockSimulator.getActiveWallet().getUser());
+		Label savings = new Label("savings");
+		// Label savings = new
+		// Label(StockSimulator.getActiveWallet().getSavings().toString()
+		// + StockSimulator.getActiveWallet().getCurrency());
 		Button logout = new Button("log out");
 		logout.addClickHandler(clickEvent -> StockSimulator.startLogin());
 
@@ -59,8 +66,10 @@ public class SimulatorUI extends LayoutPanel {
 		Label owned = new Label("Owned Equities: ");
 		DataGrid<Equity> ownedEquitiesTable = createEquitiesTable();
 
-		ownedEquitiesTable.setRowData(
-				StockSimulator.getActiveWallet().getEquities().keySet().stream().collect(Collectors.toList()));
+		if (StockSimulator.getActiveWallet() != null) {
+			ownedEquitiesTable.setRowData(
+					StockSimulator.getActiveWallet().getEquities().keySet().stream().collect(Collectors.toList()));
+		}
 
 		ownedEquityPanel.add(owned);
 		ownedEquityPanel.add(ownedEquitiesTable);

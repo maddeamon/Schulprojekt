@@ -30,12 +30,12 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 	 * @throws Exception if either username or password is wrong
 	 */
 	@Override
-	public User login(String username, String password) throws Exception {
+	public Wallet login(String username, String password) throws Exception {
 		System.out.println("Login started for " + username);
 		User user = DatabaseConnector.getUserByName(username);
 
 		if (user == null) {
-			throw new Exception("Wrong username");
+			throw new Exception("Wrong Username");
 		}
 
 		if (!securestPasswordHash(password).equals(user.getPassword())) {
@@ -44,7 +44,7 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 
 		System.out.println("Login successful.");
 
-		return user;
+		return getWallet(user);
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 	 * @return the username from the user
 	 */
 	@Override
-	public User signUp(String username, String password) {
+	public Wallet signUp(String username, String password) {
 		System.out.println("Sign up started...");
 
 		User user = new User();
@@ -64,9 +64,11 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 
 		DatabaseConnector.insertNewUser(user);
 
+		DatabaseConnector.addNewWallet(user);
+
 		System.out.println("Sign up completed.");
 
-		return user;
+		return getWallet(user);
 	}
 
 	public void removeUser(String username) {
@@ -78,7 +80,9 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 	@Override
 	public Wallet getWallet(User user) {
 		System.out.println("Recieving Wallet...");
-		return DatabaseConnector.getWallet(user.getUsername());
+		Wallet wallet = DatabaseConnector.getWallet(user.getUsername());
+		System.out.println(wallet);
+		return wallet;
 	}
 
 	@Override

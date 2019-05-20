@@ -81,4 +81,10 @@ public class Wallet implements IsSerializable {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "Wallet [username=" + username + ", walletId=" + walletId + ", ownedEquities=" + ownedEquities
+				+ ", savings=" + savings + ", currency=" + currency + "]";
+	}
+
 }

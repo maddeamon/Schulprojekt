@@ -11,9 +11,9 @@ import hts.projekt.shared.Wallet;
 
 @RemoteServiceRelativePath("service")
 public interface Service extends RemoteService {
-	User login(String username, String password) throws Exception;
+	Wallet login(String username, String password) throws Exception;
 
-	User signUp(String username, String password) throws Exception;
+	Wallet signUp(String username, String password) throws Exception;
 
 	Wallet getWallet(User user);
 
