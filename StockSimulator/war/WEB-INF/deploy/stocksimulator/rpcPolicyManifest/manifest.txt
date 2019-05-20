@@ -1,0 +1,3 @@
+# Module stocksimulator
+# RPC service class, partial path of RPC policy file
+hts.projekt.client.Service, 813515BA5B90071E4B5F25ADC151C39E.gwt.rpc
