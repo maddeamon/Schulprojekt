@@ -50,15 +50,4 @@ public class ServiceImplTest {
 		// then
 		assertFalse(equities.isEmpty());
 	}
-
-	@Test
-	public void test_buyEquity_successful() {
-
-	}
-
-	@Test
-	public void test_sellEquity_successful() {
-
-	}
-
 }

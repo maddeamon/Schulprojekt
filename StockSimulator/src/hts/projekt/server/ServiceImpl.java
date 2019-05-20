@@ -3,6 +3,8 @@ package hts.projekt.server;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import hts.projekt.client.Service;
@@ -36,7 +38,7 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 			throw new Exception("Wrong username");
 		}
 
-		if (!hashPassword(password).equals(user.getPassword())) {
+		if (!securestPasswordHash(password).equals(user.getPassword())) {
 			throw new Exception("Wrong Password");
 		}
 
@@ -58,7 +60,7 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 
 		User user = new User();
 		user.setUsername(escapeHtml(username));
-		user.setPassword(hashPassword(password));
+		user.setPassword(securestPasswordHash(password));
 
 		DatabaseConnector.insertNewUser(user);
 
@@ -119,6 +121,20 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 		}
 	}
 
+	public void addNewEquity(Equity equity) {
+		System.out.println("Adding new equity...");
+		DatabaseConnector.addNewEquity(equity);
+	}
+
+	public void removeEquity(String equityId, Long companyId) {
+		System.out.println("Removing equity with id " + equityId);
+		DatabaseConnector.removeEquity(equityId, companyId);
+	}
+
+	public Equity getEquity(String equityId) {
+		return DatabaseConnector.getEquity(equityId);
+	}
+
 	/**
 	 * Escape an html string. Escaping data received from the client helps to
 	 * prevent cross-site script vulnerabilities.
@@ -139,8 +155,8 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 	 * @param password the password to be hashed
 	 * @return the hashed password
 	 */
-	private String hashPassword(String password) {
-		return password;
+	private String securestPasswordHash(String password) {
+		return StringUtils.reverse(password);
 	}
 
 }

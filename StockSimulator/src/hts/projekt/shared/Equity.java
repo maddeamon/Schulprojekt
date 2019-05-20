@@ -8,7 +8,9 @@ public class Equity implements IsSerializable {
 
 	private String name;
 
-	private Double price;
+	private Integer price;
+
+	private String currency;
 
 	private Company owner;
 
@@ -17,14 +19,16 @@ public class Equity implements IsSerializable {
 		name = null;
 		price = null;
 		owner = null;
+		currency = null;
 	}
 
-	public Equity(String equityId, String name, Double price, Company owner) {
+	public Equity(String equityId, String name, Integer price, Company owner, String currency) {
 		super();
 		this.equityId = equityId;
 		this.name = name;
 		this.price = price;
 		this.owner = owner;
+		this.currency = currency;
 	}
 
 	public String getEquityId() {
@@ -43,11 +47,11 @@ public class Equity implements IsSerializable {
 		this.name = name;
 	}
 
-	public Double getPrice() {
+	public Integer getPrice() {
 		return price;
 	}
 
-	public void setPrice(Double price) {
+	public void setPrice(Integer price) {
 		this.price = price;
 	}
 
@@ -59,9 +63,18 @@ public class Equity implements IsSerializable {
 		this.owner = owner;
 	}
 
+	public String getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
+
 	@Override
 	public String toString() {
-		return "Equity [equityId=" + equityId + ", name=" + name + ", price=" + price + ", owner=" + owner + "]";
+		return "Equity [equityId=" + equityId + ", name=" + name + ", price=" + price + ", currency=" + currency
+				+ ", owner=" + owner + "]";
 	}
 
 }

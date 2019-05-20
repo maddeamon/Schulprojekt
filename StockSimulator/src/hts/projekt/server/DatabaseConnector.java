@@ -37,16 +37,19 @@ public class DatabaseConnector {
 		return rs;
 	}
 
-	private static void changeDataOnDatabase(String sql) {
+	private static boolean changeDataOnDatabase(String sql) {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 			Statement stmt = con.createStatement();
 			stmt.execute(sql);
 			con.close();
+
+			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	public static User getUserByName(String username) {
@@ -69,11 +72,9 @@ public class DatabaseConnector {
 		return response.stream().findAny().orElse(null);
 	}
 
-	public static User insertNewUser(User user) {
-		changeDataOnDatabase("INSERT INTO User (Benutzername, Passwort) VALUES ('" + user.getUsername() + "', '"
+	public static boolean insertNewUser(User user) {
+		return changeDataOnDatabase("INSERT INTO User (Benutzername, Passwort) VALUES ('" + user.getUsername() + "', '"
 				+ user.getPassword() + "');");
-
-		return user;
 	}
 
 	public static void removeUser(String username) {
@@ -83,13 +84,12 @@ public class DatabaseConnector {
 	public static List<Equity> getAllEquities() {
 		List<Equity> equities = new ArrayList<>();
 
-		ResultSet rs = getResultFromDatabase(
-				"SELECT * FROM Aktie a JOIN Firma_Aktie fa on a.Aktie_ID=fa.Aktie_ID JOIN Firma f on fa.Firma_ID=f.Firma_ID");
+		ResultSet rs = getResultFromDatabase("SELECT * FROM Aktie a JOIN Firma f on a.Firma_ID=f.Firma_ID");
 
 		try {
 			while (rs.next()) {
-				equities.add(new Equity(rs.getString("Aktie_ID"), rs.getString("AktieBezeichnung"),
-						rs.getDouble("Preis"), new Company(rs.getLong("Firma_ID"), rs.getString("FirmaName"))));
+				equities.add(new Equity(rs.getString("Aktie_ID"), rs.getString("AktieBezeichnung"), rs.getInt("Preis"),
+						new Company(rs.getLong("Firma_ID"), rs.getString("FirmaName")), rs.getString("Waehrung")));
 			}
 			con.close();
 		} catch (Exception e) {
@@ -111,9 +111,13 @@ public class DatabaseConnector {
 
 			for (Wallet wallet : wallets) {
 				ResultSet result = getResultFromDatabase(
-						"SELECT * FROM Wallet_Aktie WHERE Wallet_ID=" + wallet.getWalletId());
+						"SELECT * FROM Konto_Aktie ka JOIN Aktie on ka.Aktie_ID=a.Aktie_ID JOIN Firma f on a.Firma_ID=f.Firma_ID WHERE ka.Konto_ID="
+								+ wallet.getWalletId());
 				while (result.next()) {
-					// wallet.setEquities(equities);
+					wallet.addEquity(new Equity(result.getString("Aktie_ID"), result.getString("AktieBezeichnung"),
+							result.getInt("Preis"),
+							new Company(result.getLong("Firma_ID"), result.getString("FirmaName")),
+							result.getString("Waehrung")));
 				}
 			}
 			con.close();
@@ -164,6 +168,34 @@ public class DatabaseConnector {
 		return null;
 	}
 
+	public static void addNewEquity(Equity equity) {
+		changeDataOnDatabase("INSERT INTO Aktie (Aktie_ID, AktieBezeichnung, Preis, Waehrung, Firma_ID) VALUES ('"
+				+ equity.getEquityId() + "', '" + equity.getName() + "', " + equity.getPrice() + ", '"
+				+ equity.getCurrency() + "', '" + equity.getOwner().getCompanyId() + "')");
+
+		changeDataOnDatabase("INSERT INTO Firma (Firma_ID, FirmaName) VALUES ('" + equity.getOwner().getCompanyId()
+				+ "' ,'" + equity.getOwner().getName() + "')");
+	}
+
+	public static void removeEquity(String equityId, Long companyId) {
+		changeDataOnDatabase("DELETE FROM Aktie WHERE Aktie_ID='" + equityId + "'");
+		changeDataOnDatabase("DELETE FROM Firma WHERE Firma_ID=" + companyId);
+	}
+
+	public static Equity getEquity(String equityId) {
+		ResultSet rs = getResultFromDatabase(
+				"SELECT * FROM Aktie a JOIN Firma f on a.Firma_ID=f.Firma_ID WHERE a.Aktie_ID='" + equityId + "'");
+
+		try {
+			return new Equity(rs.getString("Aktie_ID"), rs.getString("AktieBezeichnung"), rs.getInt("Preis"),
+					new Company(rs.getLong("Firma_ID"), rs.getString("FirmaName")), rs.getString("Waehrung"));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
 	public static void sellEquity(Long walletId, String equityId) {
 
 	}
@@ -172,8 +204,8 @@ public class DatabaseConnector {
 
 	}
 
-	public static void updatePrice(String equityId, Double price) {
-
+	public static void updatePrice(String equityId, Integer price) {
+		changeDataOnDatabase("UPDATE Aktie SET Preis=" + price + " WHERE Aktie_ID='" + equityId + "'");
 	}
 
 }

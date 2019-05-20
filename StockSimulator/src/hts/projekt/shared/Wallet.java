@@ -73,4 +73,12 @@ public class Wallet implements IsSerializable {
 		this.currency = currency;
 	}
 
+	public void addEquity(Equity equity) {
+		if (ownedEquities.containsKey(equity)) {
+			ownedEquities.put(equity, ownedEquities.get(equity) + 1);
+		} else {
+			ownedEquities.put(equity, 1);
+		}
+	}
+
 }
