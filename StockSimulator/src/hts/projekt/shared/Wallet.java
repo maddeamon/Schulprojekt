@@ -13,11 +13,12 @@ public class Wallet implements IsSerializable {
 
 	private Map<Equity, Integer> ownedEquities;
 
-	private Double savings;
+	private Integer savings;
 
 	private String currency;
 
-	public Wallet(String username, Long walletId, Map<Equity, Integer> ownedEquities, Double savings, String currency) {
+	public Wallet(String username, Long walletId, Map<Equity, Integer> ownedEquities, Integer savings,
+			String currency) {
 		this.username = username;
 		this.walletId = walletId;
 		this.ownedEquities = ownedEquities;
@@ -57,11 +58,11 @@ public class Wallet implements IsSerializable {
 		this.ownedEquities = ownedEquities;
 	}
 
-	public Double getSavings() {
+	public Integer getSavings() {
 		return savings;
 	}
 
-	public void setSavings(Double savings) {
+	public void setSavings(Integer savings) {
 		this.savings = savings;
 	}
 

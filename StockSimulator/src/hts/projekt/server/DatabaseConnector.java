@@ -106,7 +106,7 @@ public class DatabaseConnector {
 			ResultSet rs = getResultFromDatabase("SELECT * FROM Konto WHERE Benutzername='" + username + "'");
 			while (rs.next()) {
 				wallets.add(new Wallet(rs.getString("Benutzername"), rs.getLong("Konto_ID"), null,
-						rs.getDouble("Guthaben"), rs.getString("Waehrung")));
+						rs.getInt("Guthaben"), rs.getString("Waehrung")));
 			}
 
 			for (Wallet wallet : wallets) {
@@ -138,7 +138,7 @@ public class DatabaseConnector {
 			ResultSet rs = getResultFromDatabase("SELECT * FROM Konto WHERE Konto_ID=" + walletId);
 			while (rs.next()) {
 				wallets.add(new Wallet(rs.getString("Benutzername"), rs.getLong("Konto_ID"), null,
-						rs.getDouble("Guthaben"), rs.getString("Waehrung")));
+						rs.getInt("Guthaben"), rs.getString("Waehrung")));
 			}
 
 			for (Wallet wallet : wallets) {

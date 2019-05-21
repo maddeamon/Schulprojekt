@@ -65,6 +65,6 @@ public class LoginUI extends LayoutPanel {
 		setWidgetTopHeight(verticalPanel, 30, PCT, 30, PCT);
 		setWidgetLeftWidth(verticalPanel, 30, PCT, 30, PCT);
 		setWidgetRightWidth(verticalPanel, 30, PCT, 30, PCT);
-		getElement().getStyle().setBackgroundColor("red");
+		getElement().getStyle().setBackgroundImage("url('ressources/wallstreet.png')");
 	}
 }
