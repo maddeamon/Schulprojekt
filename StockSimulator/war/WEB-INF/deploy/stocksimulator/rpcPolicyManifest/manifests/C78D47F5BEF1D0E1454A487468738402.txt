@@ -1,2 +1,0 @@
-serviceClass: hts.projekt.client.Service
-path: 813515BA5B90071E4B5F25ADC151C39E.gwt.rpc

@@ -34,6 +34,17 @@ public class StockSimulator implements EntryPoint {
 	}
 
 	public static void startLogin() {
+		service.getAllEquities(new AsyncCallback<List<Equity>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert(caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(List<Equity> result) {
+				StockSimulator.availableEquities = result;
+			}
+		});
 		contentPanel.clear();
 		contentPanel.add(LoginUI.getInstance());
 	}
@@ -79,18 +90,6 @@ public class StockSimulator implements EntryPoint {
 	}
 
 	public static List<Equity> getAvailableEquities() {
-		service.getAllEquities(new AsyncCallback<List<Equity>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(List<Equity> result) {
-				StockSimulator.availableEquities = result;
-			}
-		});
-
 		return StockSimulator.availableEquities;
 	}
 
@@ -131,5 +130,4 @@ public class StockSimulator implements EntryPoint {
 
 		});
 	}
-
 }

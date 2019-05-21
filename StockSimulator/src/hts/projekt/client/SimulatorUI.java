@@ -1,7 +1,11 @@
 package hts.projekt.client;
 
+import java.util.Collections;
 import java.util.stream.Collectors;
 
+import com.google.gwt.cell.client.ActionCell;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
@@ -9,12 +13,21 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.view.client.ListDataProvider;
 
 import hts.projekt.shared.Equity;
 
 public class SimulatorUI extends LayoutPanel {
 
 	private static SimulatorUI INSTANCE;
+
+	private ListDataProvider<Equity> availableEquities = new ListDataProvider<>();
+
+	private ListDataProvider<Equity> ownedEquities = new ListDataProvider<>();
+
+	private DataGrid<Equity> ownedEquityTable;
+
+	private DataGrid<Equity> availableEquityTable;
 
 	private SimulatorUI() {
 		initializeUI();
@@ -47,10 +60,8 @@ public class SimulatorUI extends LayoutPanel {
 	private HorizontalPanel initializeUserPanel() {
 		HorizontalPanel userPanel = new HorizontalPanel();
 		Label username = new Label(StockSimulator.getActiveWallet().getUser());
-		Label savings = new Label("savings");
-		// Label savings = new
-		// Label(StockSimulator.getActiveWallet().getSavings().toString()
-		// + StockSimulator.getActiveWallet().getCurrency());
+		Label savings = new Label(StockSimulator.getActiveWallet().getSavings().toString()
+				+ StockSimulator.getActiveWallet().getCurrency());
 		Button logout = new Button("log out");
 		logout.addClickHandler(clickEvent -> StockSimulator.startLogin());
 
@@ -64,15 +75,15 @@ public class SimulatorUI extends LayoutPanel {
 	private VerticalPanel initializeOwnedPanel() {
 		VerticalPanel ownedEquityPanel = new VerticalPanel();
 		Label owned = new Label("Owned Equities: ");
-		DataGrid<Equity> ownedEquitiesTable = createEquitiesTable();
+		ownedEquityTable = createEquitiesTable();
 
-		if (StockSimulator.getActiveWallet() != null) {
-			ownedEquitiesTable.setRowData(
-					StockSimulator.getActiveWallet().getEquities().keySet().stream().collect(Collectors.toList()));
-		}
+		ownedEquities.setList(StockSimulator.getActiveWallet().getEquities() == null ? Collections.emptyList()
+				: StockSimulator.getActiveWallet().getEquities().keySet().stream().collect(Collectors.toList()));
+
+		ownedEquities.addDataDisplay(ownedEquityTable);
 
 		ownedEquityPanel.add(owned);
-		ownedEquityPanel.add(ownedEquitiesTable);
+		ownedEquityPanel.add(ownedEquityTable);
 
 		return ownedEquityPanel;
 	}
@@ -80,18 +91,19 @@ public class SimulatorUI extends LayoutPanel {
 	private VerticalPanel initializeAvailablePanel() {
 		VerticalPanel availableEquityPanel = new VerticalPanel();
 		Label available = new Label("Available Equities: ");
-		DataGrid<Equity> availableEquitiesTable = createEquitiesTable();
+		availableEquityTable = createEquitiesTable();
 
-		availableEquitiesTable.setRowData(StockSimulator.getAvailableEquities());
+		availableEquities.setList(StockSimulator.getAvailableEquities());
+		availableEquities.addDataDisplay(availableEquityTable);
 
 		availableEquityPanel.add(available);
-		availableEquityPanel.add(availableEquitiesTable);
+		availableEquityPanel.add(availableEquityTable);
 
 		return availableEquityPanel;
 	}
 
 	private DataGrid<Equity> createEquitiesTable() {
-		DataGrid<Equity> ownedEquitiesTable = new DataGrid<>();
+		DataGrid<Equity> equitiesTable = new DataGrid<>();
 
 		TextColumn<Equity> nameColumn = new TextColumn<Equity>() {
 			@Override
@@ -110,20 +122,66 @@ public class SimulatorUI extends LayoutPanel {
 		TextColumn<Equity> priceColumn = new TextColumn<Equity>() {
 			@Override
 			public String getValue(Equity equity) {
-				return equity.getPrice().toString();
+				Integer price = equity.getPrice() / 100;
+				return price.toString();
 			}
 		};
 
-		Button sell = new Button("sell");
-		sell.addClickHandler(clickEvent -> {
-			Equity equity = new Equity();
-			StockSimulator.sellEquity(equity);
-		});
+		TextColumn<Equity> currencyColumn = new TextColumn<Equity>() {
+			@Override
+			public String getValue(Equity equity) {
+				return equity.getCurrency();
+			}
+		};
 
-		ownedEquitiesTable.addColumn(nameColumn, "Equity");
-		ownedEquitiesTable.addColumn(ownerColumn, "Company");
-		ownedEquitiesTable.addColumn(priceColumn, "Price");
-		return ownedEquitiesTable;
+		@SuppressWarnings("unchecked")
+		Column<Equity, ActionCell<Equity>> buyColumn = new Column<Equity, ActionCell<Equity>>(
+				new ActionCell("Buy", new ActionCell.Delegate<Equity>() {
+
+					@Override
+					public void execute(Equity equity) {
+						StockSimulator.buyEquity(equity);
+
+					}
+				})) {
+
+			@Override
+			public ActionCell<Equity> getValue(Equity object) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+		};
+
+		@SuppressWarnings("unchecked")
+		Column<Equity, ActionCell<Equity>> sellColumn = new Column<Equity, ActionCell<Equity>>(
+				new ActionCell("Sell", new ActionCell.Delegate<Equity>() {
+
+					@Override
+					public void execute(Equity equity) {
+						StockSimulator.buyEquity(equity);
+
+					}
+				})) {
+
+			@Override
+			public ActionCell<Equity> getValue(Equity object) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+		};
+
+		equitiesTable.addColumn(nameColumn, "Equity");
+		equitiesTable.addColumn(ownerColumn, "Company");
+		equitiesTable.addColumn(priceColumn, "Price");
+		equitiesTable.addColumn(currencyColumn, "Currency");
+		equitiesTable.addColumn(buyColumn);
+		equitiesTable.addColumn(sellColumn);
+
+		equitiesTable.setMinimumTableWidth(140, Unit.EM);
+
+		return equitiesTable;
 	}
 
 }
