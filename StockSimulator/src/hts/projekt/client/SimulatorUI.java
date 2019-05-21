@@ -1,6 +1,7 @@
 package hts.projekt.client;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.gwt.cell.client.ActionCell;
@@ -9,14 +10,15 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
-import com.google.gwt.user.client.ui.SimpleLayoutPanel;
+import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.view.client.ListDataProvider;
 
 import hts.projekt.shared.Equity;
 
-public class SimulatorUI extends LayoutPanel {
+public class SimulatorUI extends SplitLayoutPanel {
 
 	private static SimulatorUI INSTANCE;
 
@@ -28,11 +30,13 @@ public class SimulatorUI extends LayoutPanel {
 
 	private DataGrid<Equity> availableEquityTable;
 
-	private SimpleLayoutPanel ownedEquitiesPanel;
+	private LayoutPanel ownedEquitiesPanel;
 
-	private SimpleLayoutPanel availableEquitiesPanel;
+	private LayoutPanel availableEquitiesPanel;
 
-	private SimpleLayoutPanel userDataPanel;
+	private LayoutPanel tableWrapperPanel;
+
+	private HorizontalPanel userDataPanel;
 
 	private SimulatorUI() {
 		initializeUI();
@@ -52,10 +56,14 @@ public class SimulatorUI extends LayoutPanel {
 		initializeOwnedPanel();
 		initializeAvailablePanel();
 
-		getElement().getStyle().setBackgroundColor("#6CDAE7");
-		add(userDataPanel);
+		tableWrapperPanel = new LayoutPanel();
+		tableWrapperPanel.add(ownedEquitiesPanel);
+		tableWrapperPanel.add(availableEquitiesPanel);
+
+		getElement().getStyle().setBackgroundImage("url('ressources/wallstreet.png')");
+		addNorth(userDataPanel, 50);
+		addSouth(availableEquitiesPanel, 100);
 		add(ownedEquitiesPanel);
-		add(availableEquitiesPanel);
 
 		ownedEquities.setList(StockSimulator.getActiveWallet().getEquities() == null ? Collections.emptyList()
 				: StockSimulator.getActiveWallet().getEquities().keySet().stream().collect(Collectors.toList()));
@@ -64,7 +72,7 @@ public class SimulatorUI extends LayoutPanel {
 	}
 
 	private void initializeUserPanel() {
-		userDataPanel = new SimpleLayoutPanel();
+		userDataPanel = new HorizontalPanel();
 		Label username = new Label(StockSimulator.getActiveWallet().getUser());
 		Double savings = (double) (StockSimulator.getActiveWallet().getSavings() / 100);
 		Label savingsLabel = new Label(savings + StockSimulator.getActiveWallet().getCurrency());
@@ -77,9 +85,27 @@ public class SimulatorUI extends LayoutPanel {
 	}
 
 	private void initializeOwnedPanel() {
-		ownedEquitiesPanel = new SimpleLayoutPanel();
+		ownedEquitiesPanel = new LayoutPanel();
 		Label owned = new Label("Owned Equities: ");
 		ownedEquityTable = createEquitiesTable();
+
+		@SuppressWarnings("unchecked")
+		Column<Equity, ActionCell<Equity>> sellColumn = new Column<Equity, ActionCell<Equity>>(
+				new ActionCell("Sell", new ActionCell.Delegate<Equity>() {
+
+					@Override
+					public void execute(Equity equity) {
+						StockSimulator.sellEquity(equity);
+					}
+				})) {
+
+			@Override
+			public ActionCell<Equity> getValue(Equity object) {
+				return null;
+			}
+
+		};
+		ownedEquityTable.addColumn(sellColumn);
 
 		ownedEquitiesPanel.add(owned);
 		ownedEquitiesPanel.add(ownedEquityTable);
@@ -88,9 +114,28 @@ public class SimulatorUI extends LayoutPanel {
 	}
 
 	private void initializeAvailablePanel() {
-		availableEquitiesPanel = new SimpleLayoutPanel();
+		availableEquitiesPanel = new LayoutPanel();
 		Label available = new Label("Available Equities: ");
 		availableEquityTable = createEquitiesTable();
+
+		@SuppressWarnings("unchecked")
+		Column<Equity, ActionCell<Equity>> buyColumn = new Column<Equity, ActionCell<Equity>>(
+				new ActionCell("Buy", new ActionCell.Delegate<Equity>() {
+
+					@Override
+					public void execute(Equity equity) {
+						StockSimulator.buyEquity(equity.getEquityId());
+					}
+				})) {
+
+			@Override
+			public ActionCell<Equity> getValue(Equity object) {
+				return null;
+			}
+
+		};
+
+		availableEquityTable.addColumn(buyColumn);
 
 		availableEquities.addDataDisplay(availableEquityTable);
 
@@ -100,6 +145,15 @@ public class SimulatorUI extends LayoutPanel {
 
 	private DataGrid<Equity> createEquitiesTable() {
 		DataGrid<Equity> equitiesTable = new DataGrid<>();
+
+		TextColumn<Equity> idColumn = new TextColumn<Equity>() {
+
+			@Override
+			public String getValue(Equity object) {
+				return object.getEquityId();
+			}
+
+		};
 
 		TextColumn<Equity> nameColumn = new TextColumn<Equity>() {
 			@Override
@@ -130,54 +184,19 @@ public class SimulatorUI extends LayoutPanel {
 			}
 		};
 
-		@SuppressWarnings("unchecked")
-		Column<Equity, ActionCell<Equity>> buyColumn = new Column<Equity, ActionCell<Equity>>(
-				new ActionCell("Buy", new ActionCell.Delegate<Equity>() {
-
-					@Override
-					public void execute(Equity equity) {
-						StockSimulator.buyEquity(equity);
-
-					}
-				})) {
-
-			@Override
-			public ActionCell<Equity> getValue(Equity object) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-		};
-
-		@SuppressWarnings("unchecked")
-		Column<Equity, ActionCell<Equity>> sellColumn = new Column<Equity, ActionCell<Equity>>(
-				new ActionCell("Sell", new ActionCell.Delegate<Equity>() {
-
-					@Override
-					public void execute(Equity equity) {
-						StockSimulator.buyEquity(equity);
-
-					}
-				})) {
-
-			@Override
-			public ActionCell<Equity> getValue(Equity object) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-		};
-
+		equitiesTable.addColumn(idColumn, "ID");
 		equitiesTable.addColumn(nameColumn, "Equity");
 		equitiesTable.addColumn(ownerColumn, "Company");
 		equitiesTable.addColumn(priceColumn, "Price");
 		equitiesTable.addColumn(currencyColumn, "Currency");
-		equitiesTable.addColumn(buyColumn);
-		equitiesTable.addColumn(sellColumn);
 
 		equitiesTable.setMinimumTableWidth(140, Unit.EM);
 
 		return equitiesTable;
+	}
+
+	public void setOwnedEquities(List<Equity> equities) {
+		ownedEquities.setList(equities);
 	}
 
 }

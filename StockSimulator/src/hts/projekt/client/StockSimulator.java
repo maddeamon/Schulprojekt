@@ -110,14 +110,14 @@ public class StockSimulator implements EntryPoint {
 
 			@Override
 			public void onSuccess(Wallet result) {
-				StockSimulator.ACTIVE_WALLET = result;
+				StockSimulator.startSimulator(result);
 			}
 
 		});
 	}
 
-	public static void buyEquity(Equity equity) {
-		service.buyEquity(ACTIVE_WALLET.getWalletId(), equity.getEquityId(), new AsyncCallback<Wallet>() {
+	public static void buyEquity(String equityId) {
+		service.buyEquity(ACTIVE_WALLET.getWalletId(), equityId, new AsyncCallback<Wallet>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Technical Error");
@@ -125,7 +125,7 @@ public class StockSimulator implements EntryPoint {
 
 			@Override
 			public void onSuccess(Wallet result) {
-				StockSimulator.ACTIVE_WALLET = result;
+				StockSimulator.startSimulator(result);
 			}
 
 		});
