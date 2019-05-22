@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import hts.projekt.shared.Company;
@@ -105,7 +106,7 @@ public class DatabaseConnector {
 
 			ResultSet rs = getResultFromDatabase("SELECT * FROM Konto WHERE Benutzername='" + username + "'");
 			while (rs.next()) {
-				wallets.add(new Wallet(rs.getString("Benutzername"), rs.getLong("Konto_ID"), null,
+				wallets.add(new Wallet(rs.getString("Benutzername"), rs.getLong("Konto_ID"), new ArrayList<>(),
 						rs.getInt("Guthaben"), rs.getString("Waehrung")));
 			}
 
@@ -137,15 +138,19 @@ public class DatabaseConnector {
 
 			ResultSet rs = getResultFromDatabase("SELECT * FROM Konto WHERE Konto_ID=" + walletId);
 			while (rs.next()) {
-				wallets.add(new Wallet(rs.getString("Benutzername"), rs.getLong("Konto_ID"), null,
+				wallets.add(new Wallet(rs.getString("Benutzername"), rs.getLong("Konto_ID"), new ArrayList<>(),
 						rs.getInt("Guthaben"), rs.getString("Waehrung")));
 			}
 
 			for (Wallet wallet : wallets) {
 				ResultSet result = getResultFromDatabase(
-						"SELECT * FROM Konto_Aktie WHERE Konto_ID=" + wallet.getWalletId());
+						"SELECT * FROM Konto_Aktie ka JOIN Aktie a on ka.Aktie_ID=a.Aktie_ID JOIN Firma f on a.Firma_ID=f.Firma_ID WHERE ka.Konto_ID="
+								+ wallet.getWalletId());
 				while (result.next()) {
-					// wallet.setEquities(equities);
+					wallet.addEquity(new Equity(result.getString("Aktie_ID"), result.getString("AktieBezeichnung"),
+							result.getInt("Preis"),
+							new Company(result.getLong("Firma_ID"), result.getString("FirmaName")),
+							result.getString("Waehrung")));
 				}
 			}
 			con.close();
@@ -158,7 +163,7 @@ public class DatabaseConnector {
 
 	public static void addNewWallet(User user) {
 		changeDataOnDatabase("INSERT INTO Konto (Benutzername, Guthaben, Waehrung) VALUES ('" + user.getUsername()
-				+ "', 10000, 'EUR'");
+				+ "', 10000, 'EUR')");
 	}
 
 	public static Double getCurrentPrice(Long equityId) {
@@ -191,7 +196,7 @@ public class DatabaseConnector {
 
 	public static void sellEquity(Wallet wallet, Equity equity) {
 
-		changeDataOnDatabase("DELETE FROM Konto_Aktie WHERE Konto_ID=" + wallet.getWalletId() + " AND Aktie_ID 0 '"
+		changeDataOnDatabase("DELETE FROM Konto_Aktie WHERE Konto_ID=" + wallet.getWalletId() + " AND Aktie_ID='"
 				+ equity.getEquityId() + "'");
 
 		Integer newSavings = wallet.getSavings() + equity.getPrice();
@@ -203,9 +208,10 @@ public class DatabaseConnector {
 		if (equity.getPrice() > wallet.getSavings()) {
 			throw new Exception("Not enough savings.");
 		}
-
-		changeDataOnDatabase("INSERT INTO Konto_Aktie (Konto_ID, Aktie_ID) VALUES (" + wallet.getWalletId() + ", "
-				+ equity.getEquityId());
+		if (!wallet.getEquities().contains(equity)) {
+			changeDataOnDatabase("INSERT INTO Konto_Aktie (Konto_ID, Aktie_ID) VALUES (" + wallet.getWalletId() + ", '"
+					+ equity.getEquityId() + "')");
+		}
 
 		Integer newSavings = wallet.getSavings() - equity.getPrice();
 		changeDataOnDatabase("UPDATE Konto SET Guthaben=" + newSavings + " WHERE Konto_ID=" + wallet.getWalletId());

@@ -97,6 +97,8 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 		System.out.println(wallet + " is buying equity number " + equity);
 
 		DatabaseConnector.buyEquity(wallet, equity);
+		
+		System.out.println("Equity bought.");
 		return DatabaseConnector.getWallet(wallet.getWalletId());
 	}
 

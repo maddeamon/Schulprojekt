@@ -52,7 +52,7 @@ public class StockSimulator implements EntryPoint {
 	public static void startSimulator(Wallet wallet) {
 		ACTIVE_WALLET = wallet;
 		contentPanel.clear();
-		contentPanel.add(SimulatorUI.getInstance());
+		contentPanel.add(SimulatorUI.forceNewInstance());
 	}
 
 	public static void login(String username, String password) {

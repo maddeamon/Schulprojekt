@@ -1,6 +1,8 @@
 package hts.projekt.shared;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -11,7 +13,7 @@ public class Wallet implements IsSerializable {
 
 	private Long walletId;
 
-	private Map<Equity, Integer> ownedEquities;
+	private List<Equity> ownedEquities;
 
 	private Integer savings;
 
@@ -20,12 +22,12 @@ public class Wallet implements IsSerializable {
 	public Wallet() {
 		username = null;
 		walletId = null;
-		ownedEquities = new HashMap<>();
+		ownedEquities = new ArrayList<>();
 		savings = null;
 		currency = null;
 	}
 
-	public Wallet(String username, Long walletId, Map<Equity, Integer> ownedEquities, Integer savings,
+	public Wallet(String username, Long walletId, List<Equity> ownedEquities, Integer savings,
 			String currency) {
 		this.username = username;
 		this.walletId = walletId;
@@ -50,11 +52,11 @@ public class Wallet implements IsSerializable {
 		this.walletId = walletId;
 	}
 
-	public Map<Equity, Integer> getEquities() {
+	public List<Equity> getEquities() {
 		return ownedEquities;
 	}
 
-	public void setEquities(Map<Equity, Integer> ownedEquities) {
+	public void setEquities(List<Equity> ownedEquities) {
 		this.ownedEquities = ownedEquities;
 	}
 
@@ -75,11 +77,9 @@ public class Wallet implements IsSerializable {
 	}
 
 	public void addEquity(Equity equity) {
-		if (ownedEquities.containsKey(equity)) {
-			ownedEquities.put(equity, ownedEquities.get(equity) + 1);
-		} else {
-			ownedEquities.put(equity, 1);
-		}
+
+		ownedEquities.add(equity);
+
 	}
 
 	@Override

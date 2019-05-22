@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -26,15 +27,13 @@ public class SimulatorUI extends SplitLayoutPanel {
 
 	private ListDataProvider<Equity> ownedEquities = new ListDataProvider<>();
 
-	private DataGrid<Equity> ownedEquityTable;
+	private DataGrid<Equity> ownedEquityTable = new DataGrid<>();
 
-	private DataGrid<Equity> availableEquityTable;
+	private DataGrid<Equity> availableEquityTable = new DataGrid<>();
 
 	private DockLayoutPanel ownedEquitiesPanel;
 
 	private DockLayoutPanel availableEquitiesPanel;
-
-	private LayoutPanel tableWrapperPanel;
 
 	private HorizontalPanel userDataPanel;
 
@@ -49,26 +48,29 @@ public class SimulatorUI extends SplitLayoutPanel {
 
 		return INSTANCE;
 	}
+	
+	public static SimulatorUI forceNewInstance() {
+		INSTANCE = new SimulatorUI();
+		return INSTANCE;
+	}
 
 	private void initializeUI() {
 
 		initializeUserPanel();
 		initializeOwnedPanel();
 		initializeAvailablePanel();
+		
+		ownedEquities.setList(StockSimulator.getActiveWallet().getEquities() == null ? Collections.emptyList()
+				: StockSimulator.getActiveWallet().getEquities());
 
-		tableWrapperPanel = new LayoutPanel();
-		tableWrapperPanel.add(ownedEquitiesPanel);
-		tableWrapperPanel.add(availableEquitiesPanel);
+		availableEquities.setList(StockSimulator.getAvailableEquities());
 
 		getElement().getStyle().setBackgroundImage("url('ressources/wallstreet.png')");
 		addNorth(userDataPanel, 50);
 		addSouth(availableEquitiesPanel, 100);
 		add(ownedEquitiesPanel);
 
-		ownedEquities.setList(StockSimulator.getActiveWallet().getEquities() == null ? Collections.emptyList()
-				: StockSimulator.getActiveWallet().getEquities().keySet().stream().collect(Collectors.toList()));
 
-		availableEquities.setList(StockSimulator.getAvailableEquities());
 	}
 
 	private void initializeUserPanel() {
@@ -92,7 +94,7 @@ public class SimulatorUI extends SplitLayoutPanel {
 		Button sell = new Button();
 		sell.setText("Sell");
 		sell.addClickHandler(clickEvent -> StockSimulator
-				.sellEquity(getSelectedId(ownedEquities, ownedEquityTable.getSelectionModel())));
+				.sellEquity(getSelectedId(ownedEquities, ownedEquityTable.getKeyboardSelectedRow())));
 
 		ownedEquitiesPanel.addNorth(owned, 2);
 		ownedEquitiesPanel.addSouth(sell, 2);
@@ -109,7 +111,7 @@ public class SimulatorUI extends SplitLayoutPanel {
 		Button buy = new Button();
 		buy.setText("Buy");
 		buy.addClickHandler(clickEvent -> StockSimulator
-				.buyEquity(getSelectedId(availableEquities, availableEquityTable.getSelectionModel())));
+				.buyEquity(getSelectedId(availableEquities, availableEquityTable.getKeyboardSelectedRow())));
 
 		availableEquities.addDataDisplay(availableEquityTable);
 
@@ -174,8 +176,8 @@ public class SimulatorUI extends SplitLayoutPanel {
 		ownedEquities.setList(equities);
 	}
 
-	private Equity getSelectedId(ListDataProvider<Equity> provider, SelectionModel<? super Equity> selectionModel) {
-		return provider.getList().stream().filter(selectionModel::isSelected).findAny().orElse(null);
+	private Equity getSelectedId(ListDataProvider<Equity> provider, Integer selectedRow) {
+		return provider.getList().get(selectedRow);
 	}
 
 }
