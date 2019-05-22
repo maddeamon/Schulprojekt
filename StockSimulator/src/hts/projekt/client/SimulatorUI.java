@@ -175,9 +175,8 @@ public class SimulatorUI extends SplitLayoutPanel {
 		ownedEquities.setList(equities);
 	}
 
-	private String getSelectedId(ListDataProvider<Equity> provider, SelectionModel<? super Equity> selectionModel) {
-		return provider.getList().stream().filter(selectionModel::isSelected).map(Equity::getEquityId).findAny()
-				.orElse(null);
+	private Equity getSelectedId(ListDataProvider<Equity> provider, SelectionModel<? super Equity> selectionModel) {
+		return provider.getList().stream().filter(selectionModel::isSelected).findAny().orElse(null);
 	}
 
 }

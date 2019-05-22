@@ -17,6 +17,14 @@ public class Wallet implements IsSerializable {
 
 	private String currency;
 
+	public Wallet() {
+		username = null;
+		walletId = null;
+		ownedEquities = new HashMap<>();
+		savings = null;
+		currency = null;
+	}
+
 	public Wallet(String username, Long walletId, Map<Equity, Integer> ownedEquities, Integer savings,
 			String currency) {
 		this.username = username;
@@ -24,14 +32,6 @@ public class Wallet implements IsSerializable {
 		this.ownedEquities = ownedEquities;
 		this.savings = savings;
 		this.currency = currency;
-	}
-
-	public Wallet() {
-		username = null;
-		walletId = null;
-		ownedEquities = new HashMap<>();
-		savings = null;
-		currency = null;
 	}
 
 	public String getUser() {

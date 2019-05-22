@@ -19,9 +19,9 @@ public interface Service extends RemoteService {
 
 	List<Equity> getAllEquities();
 
-	Wallet buyEquity(Wallet wallet, String equityId) throws Exception;
+	Wallet buyEquity(Wallet wallet, Equity equity) throws Exception;
 
-	Wallet sellEquity(Wallet wallet, String equityId);
+	Wallet sellEquity(Wallet wallet, Equity equity);
 
 	Boolean triggerUpdatePrices();
 

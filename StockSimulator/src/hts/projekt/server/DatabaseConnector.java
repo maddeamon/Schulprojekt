@@ -203,39 +203,25 @@ public class DatabaseConnector {
 		return null;
 	}
 
-	public static void sellEquity(Wallet wallet, String equityId) {
-		Integer equityPrice = null;
-		try {
-			equityPrice = getResultFromDatabase("SELECT Preis FROM Aktie WHERE Aktie_ID='" + equityId + "'")
-					.getInt("Preis");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		changeDataOnDatabase("DELETE FROM Konto_Aktie WHERE Konto_ID=" + wallet.getWalletId() + " AND Aktie_ID 0 '"
-				+ equityId + "'");
+	public static void sellEquity(Wallet wallet, Equity equity) {
 
-		Integer newSavings = wallet.getSavings() + equityPrice;
+		changeDataOnDatabase("DELETE FROM Konto_Aktie WHERE Konto_ID=" + wallet.getWalletId() + " AND Aktie_ID 0 '"
+				+ equity.getEquityId() + "'");
+
+		Integer newSavings = wallet.getSavings() + equity.getPrice();
 		changeDataOnDatabase("UPDATE Konto SET Guthaben=" + newSavings + " WHERE Konto_ID=" + wallet.getWalletId());
 	}
 
-	public static void buyEquity(Wallet wallet, String equityId) throws Exception {
+	public static void buyEquity(Wallet wallet, Equity equity) throws Exception {
 
-		Integer equityPrice = null;
-		try {
-			equityPrice = getResultFromDatabase("SELECT Preis FROM Aktie WHERE Aktie_ID='" + equityId + "'")
-					.getInt("Preis");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		if (equityPrice > wallet.getSavings()) {
+		if (equity.getPrice() > wallet.getSavings()) {
 			throw new Exception("Not enough savings.");
 		}
 
-		changeDataOnDatabase(
-				"INSERT INTO Konto_Aktie (Konto_ID, Aktie_ID) VALUES (" + wallet.getWalletId() + ", " + equityId);
+		changeDataOnDatabase("INSERT INTO Konto_Aktie (Konto_ID, Aktie_ID) VALUES (" + wallet.getWalletId() + ", "
+				+ equity.getEquityId());
 
-		Integer newSavings = wallet.getSavings() - equityPrice;
+		Integer newSavings = wallet.getSavings() - equity.getPrice();
 		changeDataOnDatabase("UPDATE Konto SET Guthaben=" + newSavings + " WHERE Konto_ID=" + wallet.getWalletId());
 	}
 

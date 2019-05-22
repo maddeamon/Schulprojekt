@@ -1,5 +1,6 @@
 package hts.projekt.client;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -45,8 +46,9 @@ public class StockSimulator implements EntryPoint {
 				StockSimulator.availableEquities = result;
 			}
 		});
+		ACTIVE_WALLET = new Wallet("username", 1L, Collections.emptyMap(), 10000, "EUR");
 		contentPanel.clear();
-		contentPanel.add(LoginUI.getInstance());
+		contentPanel.add(SimulatorUI.getInstance());
 	}
 
 	public static void startSimulator(Wallet wallet) {
@@ -90,7 +92,8 @@ public class StockSimulator implements EntryPoint {
 	}
 
 	public static List<Equity> getAvailableEquities() {
-		return StockSimulator.availableEquities;
+		// return StockSimulator.availableEquities;
+		return Collections.emptyList();
 	}
 
 	public static Wallet getActiveWallet() {
@@ -101,8 +104,8 @@ public class StockSimulator implements EntryPoint {
 		ACTIVE_WALLET = wallet;
 	}
 
-	public static void sellEquity(String equityId) {
-		service.sellEquity(ACTIVE_WALLET, equityId, new AsyncCallback<Wallet>() {
+	public static void sellEquity(Equity equity) {
+		service.sellEquity(ACTIVE_WALLET, equity, new AsyncCallback<Wallet>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Technical Error");
@@ -116,8 +119,8 @@ public class StockSimulator implements EntryPoint {
 		});
 	}
 
-	public static void buyEquity(String equityId) {
-		service.buyEquity(ACTIVE_WALLET, equityId, new AsyncCallback<Wallet>() {
+	public static void buyEquity(Equity equity) {
+		service.buyEquity(ACTIVE_WALLET, equity, new AsyncCallback<Wallet>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Technical Error");

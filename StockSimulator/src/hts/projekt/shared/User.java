@@ -8,15 +8,15 @@ public class User implements IsSerializable {
 
 	private String password;
 
+	public User() {
+		username = null;
+		password = null;
+	}
+
 	public User(String username, String password) {
 		super();
 		this.username = username;
 		this.password = password;
-	}
-
-	public User() {
-		username = null;
-		password = null;
 	}
 
 	public String getUsername() {
@@ -33,6 +33,11 @@ public class User implements IsSerializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	@Override
+	public String toString() {
+		return "User [username=" + username + ", password=" + password + "]";
 	}
 
 }
