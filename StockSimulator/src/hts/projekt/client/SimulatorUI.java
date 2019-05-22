@@ -4,17 +4,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SelectionModel;
 
 import hts.projekt.shared.Equity;
 
@@ -30,9 +30,9 @@ public class SimulatorUI extends SplitLayoutPanel {
 
 	private DataGrid<Equity> availableEquityTable;
 
-	private LayoutPanel ownedEquitiesPanel;
+	private DockLayoutPanel ownedEquitiesPanel;
 
-	private LayoutPanel availableEquitiesPanel;
+	private DockLayoutPanel availableEquitiesPanel;
 
 	private LayoutPanel tableWrapperPanel;
 
@@ -85,62 +85,38 @@ public class SimulatorUI extends SplitLayoutPanel {
 	}
 
 	private void initializeOwnedPanel() {
-		ownedEquitiesPanel = new LayoutPanel();
+		ownedEquitiesPanel = new DockLayoutPanel(Unit.EM);
 		Label owned = new Label("Owned Equities: ");
 		ownedEquityTable = createEquitiesTable();
 
-		@SuppressWarnings("unchecked")
-		Column<Equity, ActionCell<Equity>> sellColumn = new Column<Equity, ActionCell<Equity>>(
-				new ActionCell("Sell", new ActionCell.Delegate<Equity>() {
+		Button sell = new Button();
+		sell.setText("Sell");
+		sell.addClickHandler(clickEvent -> StockSimulator
+				.sellEquity(getSelectedId(ownedEquities, ownedEquityTable.getSelectionModel())));
 
-					@Override
-					public void execute(Equity equity) {
-						StockSimulator.sellEquity(equity);
-					}
-				})) {
-
-			@Override
-			public ActionCell<Equity> getValue(Equity object) {
-				return null;
-			}
-
-		};
-		ownedEquityTable.addColumn(sellColumn);
-
-		ownedEquitiesPanel.add(owned);
+		ownedEquitiesPanel.addNorth(owned, 2);
+		ownedEquitiesPanel.addSouth(sell, 2);
 		ownedEquitiesPanel.add(ownedEquityTable);
 
 		ownedEquities.addDataDisplay(ownedEquityTable);
 	}
 
 	private void initializeAvailablePanel() {
-		availableEquitiesPanel = new LayoutPanel();
+		availableEquitiesPanel = new DockLayoutPanel(Unit.EM);
 		Label available = new Label("Available Equities: ");
 		availableEquityTable = createEquitiesTable();
 
-		@SuppressWarnings("unchecked")
-		Column<Equity, ActionCell<Equity>> buyColumn = new Column<Equity, ActionCell<Equity>>(
-				new ActionCell("Buy", new ActionCell.Delegate<Equity>() {
-
-					@Override
-					public void execute(Equity equity) {
-						StockSimulator.buyEquity(equity.getEquityId());
-					}
-				})) {
-
-			@Override
-			public ActionCell<Equity> getValue(Equity object) {
-				return null;
-			}
-
-		};
-
-		availableEquityTable.addColumn(buyColumn);
+		Button buy = new Button();
+		buy.setText("Buy");
+		buy.addClickHandler(clickEvent -> StockSimulator
+				.buyEquity(getSelectedId(ownedEquities, ownedEquityTable.getSelectionModel())));
 
 		availableEquities.addDataDisplay(availableEquityTable);
 
-		availableEquitiesPanel.add(available);
+		availableEquitiesPanel.addNorth(available, 2);
+		availableEquitiesPanel.addSouth(buy, 2);
 		availableEquitiesPanel.add(availableEquityTable);
+
 	}
 
 	private DataGrid<Equity> createEquitiesTable() {
@@ -197,6 +173,11 @@ public class SimulatorUI extends SplitLayoutPanel {
 
 	public void setOwnedEquities(List<Equity> equities) {
 		ownedEquities.setList(equities);
+	}
+
+	private String getSelectedId(ListDataProvider<Equity> provider, SelectionModel<? super Equity> selectionModel) {
+		return provider.getList().stream().filter(selectionModel::isSelected).map(Equity::getEquityId).findAny()
+				.orElse(null);
 	}
 
 }

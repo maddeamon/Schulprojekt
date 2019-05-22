@@ -17,9 +17,9 @@ public interface ServiceAsync {
 
 	void getAllEquities(AsyncCallback<List<Equity>> callback);
 
-	void buyEquity(Long walletId, String equityId, AsyncCallback<Wallet> callback);
+	void buyEquity(Wallet wallet, String equityId, AsyncCallback<Wallet> callback);
 
-	void sellEquity(Long walletId, String equityId, AsyncCallback<Wallet> callback);
+	void sellEquity(Wallet wallet, String equityId, AsyncCallback<Wallet> callback);
 
 	void triggerUpdatePrices(AsyncCallback<Boolean> callback);
 

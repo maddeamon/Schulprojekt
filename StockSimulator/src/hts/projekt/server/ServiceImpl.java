@@ -92,19 +92,20 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 	}
 
 	@Override
-	public Wallet buyEquity(Long walletId, String equityId) {
-		System.out.println(walletId + " is buying equity number " + equityId);
+	public Wallet buyEquity(Wallet wallet, String equityId) throws Exception {
 
-		DatabaseConnector.buyEquity(walletId, equityId);
-		return DatabaseConnector.getWallet(walletId);
+		System.out.println(wallet + " is buying equity number " + equityId);
+
+		DatabaseConnector.buyEquity(wallet, equityId);
+		return DatabaseConnector.getWallet(wallet.getWalletId());
 	}
 
 	@Override
-	public Wallet sellEquity(Long walletId, String equityId) {
-		System.out.printf("{} is selling equity number {}", walletId, equityId);
+	public Wallet sellEquity(Wallet wallet, String equityId) {
+		System.out.printf("{} is selling equity number {}", wallet, equityId);
 
-		DatabaseConnector.sellEquity(walletId, equityId);
-		return DatabaseConnector.getWallet(walletId);
+		DatabaseConnector.sellEquity(wallet, equityId);
+		return DatabaseConnector.getWallet(wallet.getWalletId());
 	}
 
 	@Override

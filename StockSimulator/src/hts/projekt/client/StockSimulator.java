@@ -101,8 +101,8 @@ public class StockSimulator implements EntryPoint {
 		ACTIVE_WALLET = wallet;
 	}
 
-	public static void sellEquity(Equity equity) {
-		service.sellEquity(ACTIVE_WALLET.getWalletId(), equity.getEquityId(), new AsyncCallback<Wallet>() {
+	public static void sellEquity(String equityId) {
+		service.sellEquity(ACTIVE_WALLET, equityId, new AsyncCallback<Wallet>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Technical Error");
@@ -117,7 +117,7 @@ public class StockSimulator implements EntryPoint {
 	}
 
 	public static void buyEquity(String equityId) {
-		service.buyEquity(ACTIVE_WALLET.getWalletId(), equityId, new AsyncCallback<Wallet>() {
+		service.buyEquity(ACTIVE_WALLET, equityId, new AsyncCallback<Wallet>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				Window.alert("Technical Error");
