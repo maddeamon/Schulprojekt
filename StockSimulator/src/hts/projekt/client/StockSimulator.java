@@ -1,6 +1,5 @@
 package hts.projekt.client;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -46,9 +45,8 @@ public class StockSimulator implements EntryPoint {
 				StockSimulator.availableEquities = result;
 			}
 		});
-		ACTIVE_WALLET = new Wallet("username", 1L, Collections.emptyMap(), 10000, "EUR");
 		contentPanel.clear();
-		contentPanel.add(SimulatorUI.getInstance());
+		contentPanel.add(LoginUI.getInstance());
 	}
 
 	public static void startSimulator(Wallet wallet) {
@@ -92,8 +90,7 @@ public class StockSimulator implements EntryPoint {
 	}
 
 	public static List<Equity> getAvailableEquities() {
-		// return StockSimulator.availableEquities;
-		return Collections.emptyList();
+		return StockSimulator.availableEquities;
 	}
 
 	public static Wallet getActiveWallet() {
