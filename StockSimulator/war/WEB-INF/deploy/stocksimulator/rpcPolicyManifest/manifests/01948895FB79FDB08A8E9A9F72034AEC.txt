@@ -1,0 +1,2 @@
+serviceClass: hts.projekt.client.Service
+path: 9AC9F7C6CDE953FB034B5E3A9C744C32.gwt.rpc

@@ -109,14 +109,13 @@ public class SimulatorUI extends SplitLayoutPanel {
 		Button buy = new Button();
 		buy.setText("Buy");
 		buy.addClickHandler(clickEvent -> StockSimulator
-				.buyEquity(getSelectedId(ownedEquities, ownedEquityTable.getSelectionModel())));
+				.buyEquity(getSelectedId(availableEquities, availableEquityTable.getSelectionModel())));
 
 		availableEquities.addDataDisplay(availableEquityTable);
 
 		availableEquitiesPanel.addNorth(available, 2);
 		availableEquitiesPanel.addSouth(buy, 2);
 		availableEquitiesPanel.add(availableEquityTable);
-
 	}
 
 	private DataGrid<Equity> createEquitiesTable() {

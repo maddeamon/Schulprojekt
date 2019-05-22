@@ -175,20 +175,6 @@ public class DatabaseConnector {
 		return null;
 	}
 
-	public static void addNewEquity(Equity equity) {
-		changeDataOnDatabase("INSERT INTO Aktie (Aktie_ID, AktieBezeichnung, Preis, Waehrung, Firma_ID) VALUES ('"
-				+ equity.getEquityId() + "', '" + equity.getName() + "', " + equity.getPrice() + ", '"
-				+ equity.getCurrency() + "', '" + equity.getOwner().getCompanyId() + "')");
-
-		changeDataOnDatabase("INSERT INTO Firma (Firma_ID, FirmaName) VALUES ('" + equity.getOwner().getCompanyId()
-				+ "' ,'" + equity.getOwner().getName() + "')");
-	}
-
-	public static void removeEquity(String equityId, Long companyId) {
-		changeDataOnDatabase("DELETE FROM Aktie WHERE Aktie_ID='" + equityId + "'");
-		changeDataOnDatabase("DELETE FROM Firma WHERE Firma_ID=" + companyId);
-	}
-
 	public static Equity getEquity(String equityId) {
 		ResultSet rs = getResultFromDatabase(
 				"SELECT * FROM Aktie a JOIN Firma f on a.Firma_ID=f.Firma_ID WHERE a.Aktie_ID='" + equityId + "'");

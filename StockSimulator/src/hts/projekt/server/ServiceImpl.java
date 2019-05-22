@@ -102,7 +102,7 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 
 	@Override
 	public Wallet sellEquity(Wallet wallet, Equity equity) {
-		System.out.printf("{} is selling equity number {}", wallet, equity);
+		System.out.println(wallet + " is selling equity number " + equity);
 
 		DatabaseConnector.sellEquity(wallet, equity);
 		return DatabaseConnector.getWallet(wallet.getWalletId());
@@ -124,16 +124,6 @@ public class ServiceImpl extends RemoteServiceServlet implements Service {
 				System.out.println("Update completed.");
 			}
 		}
-	}
-
-	public void addNewEquity(Equity equity) {
-		System.out.println("Adding new equity...");
-		DatabaseConnector.addNewEquity(equity);
-	}
-
-	public void removeEquity(String equityId, Long companyId) {
-		System.out.println("Removing equity with id " + equityId);
-		DatabaseConnector.removeEquity(equityId, companyId);
 	}
 
 	public Equity getEquity(String equityId) {
